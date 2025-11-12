@@ -68,7 +68,7 @@ def get_surface_normal():
 M = 1
 R = 1
 I = 2 / 5 * M * R ** 2
-FRICTION_COEFFICIENT = 0.01
+FRICTION_COEFFICIENT = 0.1
 
 state = np.zeros(6)
 
