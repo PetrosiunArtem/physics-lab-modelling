@@ -58,35 +58,40 @@ struct Point {
 
 const double SPRING_LEN = 1;
 
-void integrate(std::vector<std::vector<Point>>& points, double dt,
-               Vec2 borders) {
-    const int g = 9.8;
-    const double k = 100000.0;
+void integrate(std::vector<std::vector<Point>>& points, double dt) {
+    const double k = 100.0;
+    const double k_shift = 100.0;
 
     for (int x = 0; x < std::ssize(points); ++x) {
         for (int y = 0; y < std::ssize(points[x]); ++y) {
             points[x][y].accel = {0, 0};
 
-            points[x][y].accel.y += g;
-
             if (x + 1 < std::ssize(points)) {
                 points[x][y].accel.x += k * (points[x + 1][y].pos.x -
                                              points[x][y].pos.x - SPRING_LEN);
+                points[x][y].accel.y +=
+                    k_shift * (points[x + 1][y].pos.y - points[x][y].pos.y);
             }
 
             if (x - 1 >= 0) {
                 points[x][y].accel.x += k * (points[x - 1][y].pos.x -
                                              points[x][y].pos.x + SPRING_LEN);
+                points[x][y].accel.y +=
+                    k_shift * (points[x - 1][y].pos.y - points[x][y].pos.y);
             }
 
             if (y + 1 < std::ssize(points[x])) {
                 points[x][y].accel.y += k * (points[x][y + 1].pos.y -
                                              points[x][y].pos.y - SPRING_LEN);
+                points[x][y].accel.x +=
+                    k_shift * (points[x][y + 1].pos.x - points[x][y].pos.x);
             }
 
             if (y - 1 >= 0) {
                 points[x][y].accel.y += k * (points[x][y - 1].pos.y -
                                              points[x][y].pos.y + SPRING_LEN);
+                points[x][y].accel.x +=
+                    k_shift * (points[x][y - 1].pos.x - points[x][y].pos.x);
             }
         }
     }
@@ -94,38 +99,32 @@ void integrate(std::vector<std::vector<Point>>& points, double dt,
     for (int x = 0; x < std::ssize(points); ++x) {
         for (int y = 0; y < std::ssize(points[x]); ++y) {
             Vec2 new_pos = points[x][y].pos +
-                           0.999 * (points[x][y].pos - points[x][y].old_pos) +
+                           (points[x][y].pos - points[x][y].old_pos) +
                            points[x][y].accel * dt * dt;
 
             points[x][y].old_pos = points[x][y].pos;
             points[x][y].pos = new_pos;
-
-            const double BORDER_OFFSET = 0;
-
-            if (points[x][y].pos.x > borders.x) {
-                points[x][y].pos.x = borders.x;
-            }
-
-            if (points[x][y].pos.x < -borders.x) {
-                points[x][y].pos.x = -borders.x;
-            }
-
-            if (points[x][y].pos.y > borders.y) {
-                points[x][y].pos.y = borders.y;
-            }
-
-            if (points[x][y].pos.y < -borders.y) {
-                points[x][y].pos.y = -borders.y;
-            }
         }
+    }
+
+    for (int x = 0; x < std::ssize(points); ++x) {
+        points[x].front().pos = {x * SPRING_LEN, 0};
+        points[x].back().pos = {x * SPRING_LEN,
+                                (std::ssize(points) - 1) * SPRING_LEN};
+    }
+
+    for (int y = 0; y < std::ssize(points); ++y) {
+        points.front()[y].pos = {0, y * SPRING_LEN};
+        points.back()[y].pos = {(std::ssize(points) - 1) * SPRING_LEN,
+                                y * SPRING_LEN};
     }
 }
 
 int main() {
     InitWindow(1920, 1080, "Test");
 
-    const int X_SIZE = 100;
-    const int Y_SIZE = 100;
+    const int X_SIZE = 99;
+    const int Y_SIZE = 99;
     std::vector points(X_SIZE, std::vector(Y_SIZE, Point{}));
 
     const double SCALING = 10.0;
@@ -136,6 +135,11 @@ int main() {
             points[x][y].accel = {0, 0};
         }
     }
+
+    points[X_SIZE / 2 + 1][Y_SIZE / 2].pos.x += 0.1;
+    points[X_SIZE / 2 - 1][Y_SIZE / 2].pos.x -= 0.1;
+    points[X_SIZE / 2][Y_SIZE / 2 + 1].pos.y += 0.1;
+    points[X_SIZE / 2][Y_SIZE / 2 - 1].pos.y -= 0.1;
 
     const double g = 9.8;
 
@@ -159,7 +163,7 @@ int main() {
 
         while (time_to_integrate > 0) {
             const double DT = 1.0 / 500.0;
-            integrate(points, DT, borders);
+            integrate(points, DT);
             time_to_integrate -= DT;
         }
 
