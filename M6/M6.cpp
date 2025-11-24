@@ -11,10 +11,6 @@ struct Vec2 {
     Vec2(double x, double y) : x{x}, y{y} {}
     Vec2(Vector2 vec) : x(vec.x), y(vec.y) {}
 
-    Vec2() = default;
-    Vec2(double x, double y) : x{x}, y{y} {}
-    Vec2(Vector2 vec) : x(vec.x), y(vec.y) {}
-
     operator Vector2() const {
         return {static_cast<float>(x), static_cast<float>(y)};
     }
@@ -22,16 +18,6 @@ struct Vec2 {
     friend Vec2 operator+(Vec2 lhs, Vec2 rhs) {
         return {lhs.x + rhs.x, lhs.y + rhs.y};
     }
-
-    Vec2& operator+=(Vec2 other) {
-        x += other.x;
-        y += other.y;
-        return *this;
-    }
-
-    friend Vec2 operator-(Vec2 vec) { return {-vec.x, -vec.y}; }
-
-    friend Vec2 operator-(Vec2 lhs, Vec2 rhs) { return lhs + (-rhs); }
 
     Vec2& operator+=(Vec2 other) {
         x += other.x;
