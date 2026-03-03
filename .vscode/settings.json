@@ -1,0 +1,17 @@
+{
+    "C_Cpp.default.compilerPath": "C:/Program Files/LLVM/bin/clang++.exe",
+    "cmake.sourceDirectory": "C:/Development/physics-lab-modelling/M6",
+    "python.languageServer": "Pylance",
+    "python.defaultInterpreterPath": "C:/Users/PJutch/miniconda3/python.exe",
+    "python.analysis.extraPaths": [
+        "C:/Users/PJutch/miniconda3/Lib/site-packages",
+        "C:/Users/PJutch/miniconda3/Lib/site-packages/panda3d",
+        "C:/Users/PJutch/miniconda3/Lib/site-packages/panda3d/core"
+    ],
+    "python.autoComplete.extraPaths": [
+        "C:/Users/PJutch/miniconda3/Lib/site-packages",
+        "C:/Users/PJutch/miniconda3/Lib/site-packages/panda3d",
+        "C:/Users/PJutch/miniconda3/Lib/site-packages/panda3d/core"
+    ],
+    "python.analysis.diagnosticMode": "workspace"
+}
