@@ -302,8 +302,10 @@ def simple_solve_sphere(electrode):
 
     vis_manager.show()
 
+
 electrode = SphereElectrode(center=(0, 0, 0), radius=2.0, potential=1, n_phi=20, n_theta=20)
 simple_solve_sphere(electrode)
+
 
 def two_sphere_long_distance(electrode_pos, electrode_neg):
     electrodes = [electrode_pos, electrode_neg]
@@ -322,6 +324,7 @@ def two_sphere_long_distance(electrode_pos, electrode_neg):
     vis_manager.add_field_lines(tracer, start_points, step=0.1, max_steps=200, color='red', linewidth=0.8)
 
     vis_manager.show()
+
 
 electrode_pos = SphereElectrode(center=(-10, 0, 0), radius=2.0, potential=1, n_phi=20, n_theta=20)
 electrode_neg = SphereElectrode(center=(10, 0, 0), radius=2.0, potential=-1, n_phi=20, n_theta=20)
@@ -348,8 +351,37 @@ def concentric_spheres(electrode_inner, electrode_outer):
 
     vis_manager.show()
 
-electrode_inner = SphereElectrode(center=(0, 0, 0), radius=2.0, potential=-1, n_phi=20, n_theta=20)
-electrode_outer = SphereElectrode(center=(0, 0, 0), radius=6.0, potential=1, n_phi=20, n_theta=20)
+
+electrode_inner = SphereElectrode(center=(0, 0, 0), radius=4.0, potential=1, n_phi=20, n_theta=20)
+electrode_outer = SphereElectrode(center=(0, 0, 0), radius=8.0, potential=0, n_phi=20, n_theta=20)
 concentric_spheres(electrode_inner, electrode_outer)
 
 
+def compare_capacitance_concentric(R1=1.0, R2_max=10.0, num_points=20, n_phi=30, n_theta=20):
+    R2_values = np.linspace(R1 * 2, R2_max, num_points)
+
+    C_numeric = []
+    C_analytic = []
+
+    for R2 in R2_values:
+        electrode_inner = SphereElectrode(center=(0, 0, 0), radius=R1, potential=1.0, n_phi=n_phi, n_theta=n_theta)
+        electrode_outer = SphereElectrode(center=(0, 0, 0), radius=R2, potential=0.0, n_phi=n_phi, n_theta=n_theta)
+        solver = MoMSolver([electrode_inner, electrode_outer])
+        solution = solver.solve_vectorized()
+        C_num = solution.capacitance(electrode_inner, electrode_outer)
+        C_numeric.append(C_num)
+        C_anal = (R1 * R2) / (R2 - R1)
+        C_analytic.append(C_anal)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(R2_values, C_analytic, 'b-', label='Аналитическая')
+    plt.plot(R2_values, C_numeric, 'ro--', label='Численная')
+    plt.xlabel('Радиус внешней сферы R2')
+    plt.ylabel('Ёмкость C')
+    plt.title(f'Сравнение ёмкости концентрических сфер')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
+compare_capacitance_concentric(R1=1.0, R2_max=10.0, num_points=20, n_phi=30, n_theta=30)
